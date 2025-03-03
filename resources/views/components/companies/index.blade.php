@@ -50,47 +50,23 @@
             background: #f9f9f9;
         }
 
-        .edit-button {
+        .edit-button, .delete-button, .add-button {
             display: inline-block;
             padding: 10px 15px;
-            background: #3e54fd;
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
-        .edit-button:hover {
-            background: #1526b7;
-        }
+        .edit-button { background: #3e54fd; }
+        .edit-button:hover { background: #1526b7; }
 
-        .delete-button {
-            display: inline-block;
-            padding: 10px 15px;
-            background: #b90d0d;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
+        .delete-button { background: #b90d0d; }
+        .delete-button:hover { background: #750f0f; }
 
-        .delete-button:hover {
-            background: #750f0f;
-        }
-
-        .add-button {
-            display: inline-block;
-            padding: 10px 15px;
-            background: #28a745;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-
-        .add-button:hover {
-            background: #218838;
-        }
+        .add-button { background: #28a745; }
+        .add-button:hover { background: #218838; }
 
         .pagination {
             display: flex;
@@ -103,10 +79,6 @@
             margin: 0 5px;
         }
 
-        .pagination .page-item {
-            display: inline-block;
-        }
-
         .pagination .page-link {
             text-decoration: none;
             padding: 8px 12px;
@@ -115,58 +87,57 @@
             border-radius: 5px;
         }
 
-        .pagination .page-link:hover {
+        .pagination .page-link:hover, .pagination .active .page-link {
             background: #007bff;
             color: white;
-        }
-
-        .pagination .active .page-link {
-            background: #007bff;
-            color: white;
-            border: none;
         }
     </style>
+    <script>
+        function confirmDelete(event, url) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to delete this company?')) {
+                window.location.href = url;
+            }
+        }
+    </script>
 </head>
 <body>
-    <div class="container">
-        <h2>Company List</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Company Name</th>
-                    <th>Email</th>
-                    <th>Logo</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-            @forelse ($companies as $company)
+<div class="container">
+    <h2>Company List</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Company Name</th>
+            <th>Email</th>
+            <th>Logo</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @forelse ($companies as $company)
             <tr>
                 <td>{{ $company->id }}</td>
                 <td>{{ $company->name }}</td>
                 <td>{{ $company->email }}</td>
-                <td> <img src="{{ asset('storage/' . $company->logo_directory) }}" alt="Uploaded Image" width="200"></td>
+                <td> <img src="{{ asset('storage/' . $company->logo_directory) }}" alt="Uploaded Image" width="100"></td>
                 <td>
-                    <div>
-                        <a href={{ route('edit-company', $company->id) }} class="edit-button">Edit</a>
-                        <a href={{ route('delete-company', $company->id) }} class="delete-button">Delete</a>
-                    </div>
+                    <a href="{{ route('edit-company', $company->id) }}" class="edit-button">Edit</a>
+                    <a href="#" onclick="confirmDelete(event, '{{ route('delete-company', $company->id) }}')" class="delete-button">Delete</a>
                 </td>
             </tr>
-            @empty
-                <tr>
-                    <td rowspan="4">No data</td>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
+        @empty
+            <tr>
+                <td colspan="5">No data available</td>
+            </tr>
+        @endforelse
+        </tbody>
+    </table>
 
-        <a href={{ route('create-company') }} class="add-button">Add Company</a>
-        <div class="d-flex justify-content-center">
-            {{ $companies->links('pagination::bootstrap-5') }}
-        </div>
+    <a href="{{ route('create-company') }}" class="add-button">Add Company</a>
+    <div class="d-flex justify-content-center">
+        {{ $companies->links('pagination::bootstrap-5') }}
     </div>
-
-    </body>
+</div>
+</body>
 </html>
