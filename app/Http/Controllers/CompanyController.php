@@ -7,6 +7,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
@@ -25,6 +26,7 @@ class CompanyController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:companies'],
+            'logo' => ['nullable', 'image', 'dimensions:max_width=200,max_height=200'],
         ]);
 
         $company = Company::query()->create($validated);
@@ -49,6 +51,19 @@ class CompanyController extends Controller
     public function update(Request $request, Company $company): RedirectResponse
     {
         $company->update($request->only('name', 'email'));
+
+        $fileName = 'company-' . $company->id . '.jpg';
+
+        if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
+            if ($company->logo_directory) {
+                Storage::disk('public')->delete($fileName);
+            }
+
+            $path = $request->logo->storeAs('images', $fileName, 'public');
+            $company->logo_directory = $path;
+            $company->save();
+        }
+
         return redirect()->route('index-company');
     }
 
